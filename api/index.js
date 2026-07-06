@@ -216,7 +216,7 @@ app.get("/api/stock", requireLogin, async (req, res) => {
   res.json((await loadDB()).stock);
 });
 
-app.post("/api/stock", requireLogin, requireFounder, async (req, res) => {
+app.post("/api/stock", requireLogin, async (req, res) => {
   const { itemName, quantity, price } = req.body;
   if (!itemName) return res.status(400).json({ error: "item needs a name" });
   const db = await loadDB();
