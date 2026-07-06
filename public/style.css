@@ -716,6 +716,13 @@ select.delivery-select {
   .sidebar-action-btn { padding: 10px 12px; font-size: 13px; }
   .sidebar-user { padding: 10px 12px; }
 
+  /* KEY FIX: remove flex:1 from nav so sidebar can actually scroll.
+     flex:1 forces the nav to fill remaining space → total height = 100vh → no overflow → no scroll.
+     Setting it to flex:none lets content exceed 100vh and triggers overflow-y:auto on the sidebar. */
+  .sidebar-nav { flex: none; }
+  .sidebar-footer { flex-shrink: 0; }
+
+
   /* Main content fills whole screen */
   .main-content,
   .sidebar.collapsed ~ .main-content { margin-left: 0 !important; }
