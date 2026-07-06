@@ -15,7 +15,7 @@
   <div id="loginScreen" class="login-screen">
     <div class="login-card">
       <div class="brand">
-        <div class="brand-icon">☕</div>
+        <img src="img/1111-removebg-preview.png" alt="Logo" class="brand-logo" />
         <div>
           <h1>STATIC ADMIN</h1>
           <p class="tagline">orders in, stock tracked, team synced</p>
@@ -38,7 +38,7 @@
     <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-brand">
-        <div class="brand-icon">☕</div>
+        <img src="img/1111-removebg-preview.png" alt="Logo" class="sidebar-logo" />
         <div class="sidebar-brand-text">
           <span class="sidebar-title">STATIC</span>
           <span class="sidebar-sub">Admin Page</span>
@@ -47,15 +47,15 @@
 
       <nav class="sidebar-nav">
         <button class="nav-item active" data-tab="orders">
-          <span class="nav-icon">📋</span>
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
           <span>Orders</span>
         </button>
         <button class="nav-item" data-tab="stock">
-          <span class="nav-icon">📦</span>
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
           <span>Stock</span>
         </button>
         <button class="nav-item founder-only hidden" data-tab="team">
-          <span class="nav-icon">👥</span>
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
           <span>Team</span>
         </button>
       </nav>
@@ -73,8 +73,18 @@
           </div>
         </div>
         <div class="sidebar-actions">
-          <button id="openChangePassword" class="sidebar-action-btn">🔑 Change password</button>
-          <button id="logoutBtn" class="sidebar-action-btn danger">← Log out</button>
+          <button id="darkModeToggle" class="sidebar-action-btn" title="Toggle dark mode">
+            <svg id="darkModeIcon" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px;display:inline;vertical-align:middle;margin-right:6px"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+            Dark mode
+          </button>
+          <button id="openChangePassword" class="sidebar-action-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px;display:inline;vertical-align:middle;margin-right:6px"><path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"/></svg>
+            Change password
+          </button>
+          <button id="logoutBtn" class="sidebar-action-btn danger">
+            <svg viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px;display:inline;vertical-align:middle;margin-right:6px"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+            Log out
+          </button>
         </div>
       </div>
     </aside>
@@ -177,7 +187,7 @@
     <div class="modal-card wide-modal">
       <div class="modal-header">
         <h3>New Order</h3>
-        <button type="button" class="modal-close-btn" data-close="orderModal">✕</button>
+        <button type="button" class="modal-close-btn" data-close="orderModal">&#x2715;</button>
       </div>
       <form id="orderForm">
         <div class="form-grid">
@@ -244,7 +254,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3>Change Password</h3>
-        <button type="button" class="modal-close-btn" data-close="passwordModal">✕</button>
+        <button type="button" class="modal-close-btn" data-close="passwordModal">&#x2715;</button>
       </div>
       <form id="passwordForm">
         <div class="form-field">
@@ -269,7 +279,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3>New Stock Item</h3>
-        <button type="button" class="modal-close-btn" data-close="stockModal">✕</button>
+        <button type="button" class="modal-close-btn" data-close="stockModal">&#x2715;</button>
       </div>
       <form id="stockForm">
         <div class="form-field">
