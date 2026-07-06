@@ -99,8 +99,9 @@ body.dark .login-screen {
   height: 44px;
   object-fit: contain;
   border-radius: 10px;
-  background: var(--sidebar-bg);
-  padding: 4px;
+  background: #F5F0E6;
+  border: 1px solid #DDD5C8;
+  padding: 6px;
   flex-shrink: 0;
 }
 .login-card h1 {
@@ -215,8 +216,9 @@ button { font-family: var(--font); cursor: pointer; transition: all 0.15s; }
   height: 36px;
   object-fit: contain;
   border-radius: 8px;
-  background: rgba(255,255,255,0.08);
-  padding: 3px;
+  background: #F5F0E6;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 4px;
   flex-shrink: 0;
 }
 .sidebar-brand-text {
