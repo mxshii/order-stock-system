@@ -619,3 +619,162 @@ select.delivery-select {
 .add-staff-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 14px; color: var(--text); }
 .inline-form { display: flex; gap: 12px; align-items: flex-end; }
 .inline-form .form-field { flex: 1; }
+
+/* ─── SIDEBAR COLLAPSE (shared) ─────────────────────────────────── */
+.sidebar {
+  transition: background 0.25s, transform 0.28s cubic-bezier(0.4,0,0.2,1), width 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+
+.sidebar.collapsed {
+  width: 64px;
+}
+.sidebar.collapsed .sidebar-brand-text,
+.sidebar.collapsed .sidebar-sub,
+.sidebar.collapsed .nav-item span,
+.sidebar.collapsed .sidebar-sync,
+.sidebar.collapsed .user-info,
+.sidebar.collapsed .sidebar-actions {
+  display: none;
+}
+.sidebar.collapsed .sidebar-brand {
+  justify-content: center;
+  padding: 16px 0;
+}
+.sidebar.collapsed .sidebar-nav {
+  padding: 14px 8px;
+  align-items: center;
+}
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 10px;
+  gap: 0;
+  width: 44px;
+}
+.sidebar.collapsed .sidebar-footer {
+  align-items: center;
+  padding: 12px 8px;
+}
+.sidebar.collapsed .sidebar-user {
+  justify-content: center;
+  padding: 8px;
+  background: transparent;
+}
+.sidebar.collapsed .nav-icon { width: 18px; height: 18px; }
+
+.main-content {
+  transition: margin-left 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+.sidebar.collapsed ~ .main-content {
+  margin-left: 64px;
+}
+
+/* ─── TOPBAR TOGGLE BUTTON ────────────────────────────────────────── */
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sidebar-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.sidebar-toggle-btn:hover {
+  background: var(--surface-raised);
+  color: var(--text);
+}
+
+/* ─── MOBILE BACKDROP ─────────────────────────────────────────────── */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 9;
+  backdrop-filter: blur(2px);
+}
+.sidebar-backdrop.active { display: block; }
+
+/* ─── MOBILE RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  :root { --sidebar-width: 240px; }
+
+  /* sidebar slides in over content — starts off screen */
+  .sidebar {
+    transform: translateX(-100%);
+    width: var(--sidebar-width) !important;
+    z-index: 20;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  /* undo collapsed icon-only mode on mobile — show full sidebar */
+  .sidebar.collapsed.mobile-open .sidebar-brand-text,
+  .sidebar.collapsed.mobile-open .sidebar-sub,
+  .sidebar.collapsed.mobile-open .nav-item span,
+  .sidebar.collapsed.mobile-open .sidebar-sync,
+  .sidebar.collapsed.mobile-open .user-info,
+  .sidebar.collapsed.mobile-open .sidebar-actions { display: flex; }
+  .sidebar.collapsed.mobile-open .sidebar-brand { justify-content: flex-start; padding: 20px 18px 18px; }
+  .sidebar.collapsed.mobile-open .sidebar-nav { padding: 14px 10px; align-items: stretch; }
+  .sidebar.collapsed.mobile-open .nav-item { justify-content: flex-start; padding: 9px 12px; width: 100%; gap: 11px; }
+  .sidebar.collapsed.mobile-open .sidebar-footer { align-items: stretch; padding: 14px 10px; }
+  .sidebar.collapsed.mobile-open .sidebar-user { justify-content: flex-start; padding: 8px 10px; background: rgba(255,255,255,0.05); }
+
+  /* main takes full width — sidebar is overlay */
+  .main-content,
+  .sidebar.collapsed ~ .main-content {
+    margin-left: 0 !important;
+  }
+
+  /* topbar */
+  .topbar { padding: 0 16px; }
+  .topbar-date { display: none; }
+
+  /* panels */
+  .tab-panel { padding: 16px; }
+  .panel-header h2 { font-size: 16px; }
+
+  /* tables — horizontal scroll */
+  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .data-table { min-width: 560px; }
+  .data-table th, .data-table td { padding: 10px 12px; }
+
+  /* login card */
+  .login-card { width: calc(100vw - 32px); padding: 32px 24px; }
+
+  /* modals — full-width bottom sheet feel */
+  .modal { align-items: flex-end; padding: 0; }
+  .modal-card, .wide-modal {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 90vh;
+  }
+
+  /* form grids collapse to 1 col */
+  .form-grid,
+  .form-grid-2,
+  .form-grid-3 { grid-template-columns: 1fr; }
+
+  /* inline staff form stacks */
+  .inline-form { flex-direction: column; }
+  .inline-form button { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .topbar { padding: 0 12px; }
+  .page-title { font-size: 14px; }
+  .tab-panel { padding: 12px; }
+  .primary-btn { padding: 8px 14px; font-size: 12px; }
+  .data-table { min-width: 480px; }
+}

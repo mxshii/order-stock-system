@@ -2,6 +2,53 @@ let me = null;
 
 const $ = (sel) => document.querySelector(sel);
 
+(function initSidebar() {
+  const sidebar  = document.querySelector(".sidebar");
+  const backdrop = document.getElementById("sidebarBackdrop");
+  const isMobile = () => window.innerWidth <= 768;
+
+  function openMobile() {
+    sidebar.classList.add("mobile-open");
+    backdrop.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+  function closeMobile() {
+    sidebar.classList.remove("mobile-open");
+    backdrop.classList.remove("active");
+    document.body.style.overflow = "";
+  }
+  function toggleDesktop() {
+    const collapsed = sidebar.classList.toggle("collapsed");
+    localStorage.setItem("sidebarCollapsed", collapsed);
+  }
+
+  const saved = localStorage.getItem("sidebarCollapsed");
+  if (saved === "true" && !isMobile()) sidebar.classList.add("collapsed");
+
+  document.getElementById("sidebarToggle").addEventListener("click", () => {
+    if (isMobile()) {
+      sidebar.classList.contains("mobile-open") ? closeMobile() : openMobile();
+    } else {
+      toggleDesktop();
+    }
+  });
+
+  backdrop.addEventListener("click", closeMobile);
+
+  document.querySelectorAll(".nav-item").forEach((btn) => {
+    btn.addEventListener("click", () => { if (isMobile()) closeMobile(); });
+  });
+
+  window.addEventListener("resize", () => {
+    if (!isMobile()) {
+      closeMobile();
+      if (localStorage.getItem("sidebarCollapsed") === "true") {
+        sidebar.classList.add("collapsed");
+      }
+    }
+  });
+})();
+
 async function api(url, method = "GET", body) {
   const res = await fetch(url, {
     method,
