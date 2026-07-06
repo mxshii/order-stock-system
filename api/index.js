@@ -159,8 +159,9 @@ app.get("/api/orders", requireLogin, async (req, res) => {
 });
 
 app.post("/api/orders", requireLogin, async (req, res) => {
-  const { customerName, items, address, paymentStatus, deliveryStatus, shippingPrice } = req.body;
+  const { customerName, phone, email, items, address, paymentStatus, deliveryStatus, shippingPrice } = req.body;
   if (!customerName || !address) return res.status(400).json({ error: "need at least a name and address" });
+  if (!phone) return res.status(400).json({ error: "phone number is required" });
   if (!items || items.length === 0) return res.status(400).json({ error: "pick at least one item from stock" });
 
   const db = await loadDB();
@@ -176,6 +177,8 @@ app.post("/api/orders", requireLogin, async (req, res) => {
   const freshOrder = {
     id: "ord_" + Date.now(),
     customerName,
+    phone,
+    email: email || null,
     items, // e.g. [{ stockId: "stk_123", name: "Blue Hoodie", qty: 2, price: 25 }]
     address,
     shippingPrice: Number(shippingPrice) || 0,

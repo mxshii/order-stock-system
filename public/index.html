@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>STATIC ADMIN PAGE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -12,15 +15,17 @@
   <div id="loginScreen" class="login-screen">
     <div class="login-card">
       <div class="brand">
-        <span class="brand-dot"></span>
-        <h1>STATIC ADMIN PAGE</h1>
+        <div class="brand-icon">☕</div>
+        <div>
+          <h1>STATIC ADMIN</h1>
+          <p class="tagline">orders in, stock tracked, team synced</p>
+        </div>
       </div>
-      <p class="tagline">orders in, stock tracked, everybody's laptop stays in sync</p>
       <form id="loginForm">
         <label>Username</label>
-        <input type="text" id="loginUsername" autocomplete="username" required />
+        <input type="text" id="loginUsername" autocomplete="username" placeholder="your username" required />
         <label>Password</label>
-        <input type="password" id="loginPassword" autocomplete="current-password" required />
+        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••" required />
         <button type="submit">Log in</button>
         <p id="loginError" class="error-text"></p>
       </form>
@@ -29,122 +34,203 @@
 
   <!-- MAIN APP -->
   <div id="app" class="app hidden">
-    <header class="topbar">
-      <div class="brand">
-        <span class="brand-dot"></span>
-        <h1>STATIC ADMIN PAGE</h1>
-      </div>
-      <div class="sync-indicator" id="syncIndicator">
-        <span class="pulse"></span> LIVE — <span id="syncTime">just now</span>
-      </div>
-      <div class="who-am-i">
-        <span id="meUsername">—</span>
-        <span id="meRole" class="role-badge">—</span>
-        <button id="openChangePassword" class="ghost-btn">Change password</button>
-        <button id="logoutBtn" class="ghost-btn">Log out</button>
-      </div>
-    </header>
 
-    <nav class="tabs">
-      <button class="tab-btn active" data-tab="orders">Orders</button>
-      <button class="tab-btn" data-tab="stock">Stock</button>
-      <button class="tab-btn founder-only hidden" data-tab="team">Team</button>
-    </nav>
-
-    <!-- ORDERS TAB -->
-    <section id="tab-orders" class="tab-panel active">
-      <div class="panel-header">
-        <h2>Orders</h2>
-        <button id="openAddOrder" class="primary-btn">+ New order</button>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">☕</div>
+        <div class="sidebar-brand-text">
+          <span class="sidebar-title">STATIC</span>
+          <span class="sidebar-sub">Admin Page</span>
+        </div>
       </div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Customer</th>
-            <th>Items</th>
-            <th>Address</th>
-            <th>Total</th>
-            <th>Shipping</th>
-            <th>Payment</th>
-            <th>Delivery</th>
-            <th>Placed</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="ordersBody"></tbody>
-      </table>
-      <p id="ordersEmpty" class="empty-state hidden">No orders yet. Hit "New order" to log the first one.</p>
-    </section>
 
-    <!-- STOCK TAB -->
-    <section id="tab-stock" class="tab-panel">
-      <div class="panel-header">
-        <h2>Stock</h2>
-        <button id="openAddStock" class="primary-btn">+ New item</button>
-      </div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="stockBody"></tbody>
-      </table>
-      <p id="stockEmpty" class="empty-state hidden">No stock items yet.</p>
-    </section>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="orders">
+          <span class="nav-icon">📋</span>
+          <span>Orders</span>
+        </button>
+        <button class="nav-item" data-tab="stock">
+          <span class="nav-icon">📦</span>
+          <span>Stock</span>
+        </button>
+        <button class="nav-item founder-only hidden" data-tab="team">
+          <span class="nav-icon">👥</span>
+          <span>Team</span>
+        </button>
+      </nav>
 
-    <!-- TEAM TAB (founder only) -->
-    <section id="tab-team" class="tab-panel">
-      <div class="panel-header">
-        <h2>Team access</h2>
+      <div class="sidebar-footer">
+        <div class="sidebar-sync">
+          <span class="pulse"></span>
+          <span id="syncTime">just now</span>
+        </div>
+        <div class="sidebar-user">
+          <div class="user-avatar" id="userAvatarLetter">?</div>
+          <div class="user-info">
+            <span id="meUsername" class="user-name">—</span>
+            <span id="meRole" class="role-badge">—</span>
+          </div>
+        </div>
+        <div class="sidebar-actions">
+          <button id="openChangePassword" class="sidebar-action-btn">🔑 Change password</button>
+          <button id="logoutBtn" class="sidebar-action-btn danger">← Log out</button>
+        </div>
       </div>
-      <form id="addStaffForm" class="inline-form">
-        <input type="text" id="newStaffUsername" placeholder="new username" required />
-        <input type="text" id="newStaffPassword" placeholder="temp password" required />
-        <button type="submit" class="primary-btn">+ Add staff account</button>
-      </form>
-      <table class="data-table">
-        <thead>
-          <tr><th>Username</th><th>Role</th><th></th></tr>
-        </thead>
-        <tbody id="usersBody"></tbody>
-      </table>
-    </section>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div id="pageTitle" class="page-title">Orders</div>
+        <div class="topbar-right">
+          <div class="topbar-date" id="topbarDate"></div>
+        </div>
+      </header>
+
+      <!-- ORDERS TAB -->
+      <section id="tab-orders" class="tab-panel active">
+        <div class="panel-header">
+          <h2>All Orders</h2>
+          <button id="openAddOrder" class="primary-btn">+ New order</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Items</th>
+                <th>Address</th>
+                <th>Total</th>
+                <th>Shipping</th>
+                <th>Payment</th>
+                <th>Delivery</th>
+                <th>Placed</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+          <p id="ordersEmpty" class="empty-state hidden">No orders yet. Hit "New order" to log the first one.</p>
+        </div>
+      </section>
+
+      <!-- STOCK TAB -->
+      <section id="tab-stock" class="tab-panel">
+        <div class="panel-header">
+          <h2>Stock Items</h2>
+          <button id="openAddStock" class="primary-btn">+ New item</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="stockBody"></tbody>
+          </table>
+          <p id="stockEmpty" class="empty-state hidden">No stock items yet.</p>
+        </div>
+      </section>
+
+      <!-- TEAM TAB (founder only) -->
+      <section id="tab-team" class="tab-panel">
+        <div class="panel-header">
+          <h2>Team Access</h2>
+        </div>
+        <div class="add-staff-card">
+          <h3>Add Staff Account</h3>
+          <form id="addStaffForm" class="inline-form">
+            <div class="form-field">
+              <label>Username</label>
+              <input type="text" id="newStaffUsername" placeholder="new username" required />
+            </div>
+            <div class="form-field">
+              <label>Temp Password</label>
+              <input type="text" id="newStaffPassword" placeholder="temp password" required />
+            </div>
+            <button type="submit" class="primary-btn" style="align-self:flex-end">+ Add staff</button>
+          </form>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr><th>Username</th><th>Role</th><th></th></tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
   </div>
 
   <!-- ADD ORDER MODAL -->
   <div id="orderModal" class="modal hidden">
-    <div class="modal-card">
-      <h3>New order</h3>
+    <div class="modal-card wide-modal">
+      <div class="modal-header">
+        <h3>New Order</h3>
+        <button type="button" class="modal-close-btn" data-close="orderModal">✕</button>
+      </div>
       <form id="orderForm">
-        <label>Customer name</label>
-        <input type="text" id="ordCustomer" required />
-        <label>Address</label>
-        <input type="text" id="ordAddress" required />
-        <label>Items</label>
-        <div id="orderItemsList"></div>
-        <button type="button" id="addItemRow" class="ghost-btn" style="margin-top:6px;width:100%">+ Add item</button>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Customer name <span class="req">*</span></label>
+            <input type="text" id="ordCustomer" placeholder="John Doe" required />
+          </div>
+          <div class="form-field">
+            <label>Phone number <span class="req">*</span></label>
+            <input type="tel" id="ordPhone" placeholder="+1 555 000 0000" required />
+          </div>
+          <div class="form-field">
+            <label>Email <span class="opt">(optional)</span></label>
+            <input type="email" id="ordEmail" placeholder="customer@email.com" />
+          </div>
+          <div class="form-field">
+            <label>Address <span class="req">*</span></label>
+            <input type="text" id="ordAddress" placeholder="123 Main St, City" required />
+          </div>
+        </div>
 
-        <label>Shipping price</label>
-        <input type="number" id="ordShipping" value="0" min="0" step="0.01" />
+        <div class="form-section-label">Items <span class="req">*</span></div>
+        <div id="orderItemsList" class="items-list"></div>
+        <button type="button" id="addItemRow" class="add-item-btn">+ Add item</button>
 
-        <p class="order-total-preview">Total so far: <span id="orderTotalPreview">$0.00</span></p>
+        <div class="form-grid form-grid-3 mt-16">
+          <div class="form-field">
+            <label>Shipping price</label>
+            <input type="number" id="ordShipping" value="0" min="0" step="0.01" />
+          </div>
+          <div class="form-field">
+            <label>Payment status</label>
+            <select id="ordPayment">
+              <option value="unpaid">Unpaid</option>
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Delivery status</label>
+            <select id="ordDelivery">
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+            </select>
+          </div>
+        </div>
 
-        <label>Payment status</label>
-        <select id="ordPayment">
-          <option value="unpaid">Unpaid</option>
-          <option value="pending">Pending</option>
-          <option value="paid">Paid</option>
-        </select>
-        <label>Delivery status</label>
-        <select id="ordDelivery">
-          <option value="processing">Processing</option>
-          <option value="shipped">Shipped</option>
-          <option value="delivered">Delivered</option>
-        </select>
+        <div class="order-total-bar">
+          <span class="total-label">Order Total</span>
+          <span id="orderTotalPreview" class="total-amount">$0.00</span>
+        </div>
+
         <div class="modal-actions">
           <button type="button" class="ghost-btn" data-close="orderModal">Cancel</button>
           <button type="submit" class="primary-btn">Save order</button>
@@ -156,12 +242,19 @@
   <!-- CHANGE PASSWORD MODAL -->
   <div id="passwordModal" class="modal hidden">
     <div class="modal-card">
-      <h3>Change password</h3>
+      <div class="modal-header">
+        <h3>Change Password</h3>
+        <button type="button" class="modal-close-btn" data-close="passwordModal">✕</button>
+      </div>
       <form id="passwordForm">
-        <label>Current password</label>
-        <input type="password" id="pwOld" required />
-        <label>New password (6+ characters)</label>
-        <input type="password" id="pwNew" required minlength="6" />
+        <div class="form-field">
+          <label>Current password</label>
+          <input type="password" id="pwOld" required />
+        </div>
+        <div class="form-field">
+          <label>New password <span class="opt">(6+ characters)</span></label>
+          <input type="password" id="pwNew" required minlength="6" />
+        </div>
         <p id="pwError" class="error-text"></p>
         <div class="modal-actions">
           <button type="button" class="ghost-btn" data-close="passwordModal">Cancel</button>
@@ -174,14 +267,25 @@
   <!-- ADD STOCK MODAL -->
   <div id="stockModal" class="modal hidden">
     <div class="modal-card">
-      <h3>New stock item</h3>
+      <div class="modal-header">
+        <h3>New Stock Item</h3>
+        <button type="button" class="modal-close-btn" data-close="stockModal">✕</button>
+      </div>
       <form id="stockForm">
-        <label>Item name</label>
-        <input type="text" id="stkName" required />
-        <label>Quantity</label>
-        <input type="number" id="stkQty" value="0" min="0" required />
-        <label>Price</label>
-        <input type="number" id="stkPrice" value="0" min="0" step="0.01" required />
+        <div class="form-field">
+          <label>Item name <span class="req">*</span></label>
+          <input type="text" id="stkName" placeholder="e.g. Blue Hoodie" required />
+        </div>
+        <div class="form-grid form-grid-2 mt-4">
+          <div class="form-field">
+            <label>Quantity <span class="req">*</span></label>
+            <input type="number" id="stkQty" value="0" min="0" required />
+          </div>
+          <div class="form-field">
+            <label>Price <span class="req">*</span></label>
+            <input type="number" id="stkPrice" value="0" min="0" step="0.01" required />
+          </div>
+        </div>
         <div class="modal-actions">
           <button type="button" class="ghost-btn" data-close="stockModal">Cancel</button>
           <button type="submit" class="primary-btn">Save item</button>

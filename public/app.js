@@ -1,9 +1,9 @@
-// app.js — the thing that actually makes the buttons do stuff
-// state lives up here so every function can see it without passing it around like a hot potato
+// app.js — wired up for the new sidebar layout + phone/email fields
 let me = null;
 
-// ---------- helpers ----------
+// ── helpers ──────────────────────────────────────────────────────────────
 const $ = (sel) => document.querySelector(sel);
+
 async function api(url, method = "GET", body) {
   const res = await fetch(url, {
     method,
@@ -14,12 +14,28 @@ async function api(url, method = "GET", body) {
   if (!res.ok) throw new Error(data.error || "something broke");
   return data;
 }
+
 function money(n) {
   return "$" + Number(n || 0).toFixed(2);
 }
 
-// ---------- boot ----------
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str ?? "";
+  return div.innerHTML;
+}
+
+// ── boot ──────────────────────────────────────────────────────────────────
 (async function boot() {
+  // show today's date in topbar
+  const now = new Date();
+  const dayEl = $("#topbarDate");
+  if (dayEl) {
+    dayEl.textContent = now.toLocaleDateString("en-US", {
+      weekday: "long", year: "numeric", month: "long", day: "numeric",
+    });
+  }
+
   const { user } = await api("/api/me");
   if (user) {
     me = user;
@@ -29,7 +45,7 @@ function money(n) {
   }
 })();
 
-// ---------- login / logout ----------
+// ── login / logout ────────────────────────────────────────────────────────
 $("#loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   $("#loginError").textContent = "";
@@ -53,8 +69,12 @@ $("#logoutBtn").addEventListener("click", async () => {
 function enterApp() {
   $("#loginScreen").classList.add("hidden");
   $("#app").classList.remove("hidden");
+
+  // populate sidebar user info
   $("#meUsername").textContent = me.username;
   $("#meRole").textContent = me.role;
+  const avatarEl = $("#userAvatarLetter");
+  if (avatarEl) avatarEl.textContent = me.username.charAt(0).toUpperCase();
 
   if (me.role === "founder") {
     document.querySelectorAll(".founder-only").forEach((el) => el.classList.remove("hidden"));
@@ -65,20 +85,22 @@ function enterApp() {
   if (me.role === "founder") loadUsers();
 }
 
-// ---------- tabs ----------
-document.querySelectorAll(".tab-btn").forEach((btn) => {
+// ── sidebar navigation ────────────────────────────────────────────────────
+const pageTitles = { orders: "Orders", stock: "Stock", team: "Team Access" };
+
+document.querySelectorAll(".nav-item").forEach((btn) => {
   btn.addEventListener("click", () => {
-    document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach((b) => b.classList.remove("active"));
     document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
     btn.classList.add("active");
-    $("#tab-" + btn.dataset.tab).classList.add("active");
+    const tab = btn.dataset.tab;
+    $("#tab-" + tab).classList.add("active");
+    const titleEl = $("#pageTitle");
+    if (titleEl) titleEl.textContent = pageTitles[tab] || tab;
   });
 });
 
-// ---------- live-ish sync ----------
-// no persistent connection here on purpose — Vercel's serverless functions don't keep
-// sockets open, so instead every connected laptop just quietly asks "anything new?"
-// every few seconds. Feels basically instant in real use.
+// ── live sync ─────────────────────────────────────────────────────────────
 setInterval(async () => {
   if (!me) return;
   await loadOrders();
@@ -87,7 +109,7 @@ setInterval(async () => {
   $("#syncTime").textContent = new Date().toLocaleTimeString();
 }, 4000);
 
-// ---------- ORDERS ----------
+// ── ORDERS ────────────────────────────────────────────────────────────────
 async function loadOrders() {
   const orders = await api("/api/orders");
   const body = $("#ordersBody");
@@ -96,33 +118,37 @@ async function loadOrders() {
 
   orders
     .slice()
-    .reverse() // newest first, nobody wants to scroll to find today's order
+    .reverse()
     .forEach((o) => {
       const total = (o.items || []).reduce((sum, it) => sum + it.qty * it.price, 0) + Number(o.shippingPrice || 0);
       const itemsText = (o.items || []).map((it) => `${it.name} x${it.qty}`).join(", ") || "—";
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${escapeHtml(o.customerName)}</td>
-        <td>${escapeHtml(itemsText)}</td>
+        <td>
+          <div style="font-weight:600;font-family:var(--font)">${escapeHtml(o.customerName)}</div>
+          ${o.email ? `<div style="font-size:11px;color:var(--text-muted);font-family:var(--font)">${escapeHtml(o.email)}</div>` : ""}
+        </td>
+        <td>${escapeHtml(o.phone || "—")}</td>
+        <td title="${escapeHtml(itemsText)}">${escapeHtml(itemsText.length > 40 ? itemsText.slice(0, 38) + "…" : itemsText)}</td>
         <td>${escapeHtml(o.address)}</td>
-        <td>${money(total)}</td>
+        <td style="font-weight:600">${money(total)}</td>
         <td>${money(o.shippingPrice)}</td>
         <td>
           <select data-order-id="${o.id}" class="payment-select">
-            <option value="unpaid" ${o.paymentStatus === "unpaid" ? "selected" : ""}>Unpaid</option>
+            <option value="unpaid"  ${o.paymentStatus === "unpaid"  ? "selected" : ""}>Unpaid</option>
             <option value="pending" ${o.paymentStatus === "pending" ? "selected" : ""}>Pending</option>
-            <option value="paid" ${o.paymentStatus === "paid" ? "selected" : ""}>Paid</option>
+            <option value="paid"    ${o.paymentStatus === "paid"    ? "selected" : ""}>Paid</option>
           </select>
         </td>
         <td>
           <select data-order-id="${o.id}" class="delivery-select">
             <option value="processing" ${o.deliveryStatus === "processing" ? "selected" : ""}>Processing</option>
-            <option value="shipped" ${o.deliveryStatus === "shipped" ? "selected" : ""}>Shipped</option>
-            <option value="delivered" ${o.deliveryStatus === "delivered" ? "selected" : ""}>Delivered</option>
+            <option value="shipped"    ${o.deliveryStatus === "shipped"    ? "selected" : ""}>Shipped</option>
+            <option value="delivered"  ${o.deliveryStatus === "delivered"  ? "selected" : ""}>Delivered</option>
           </select>
         </td>
         <td>${new Date(o.createdAt).toLocaleDateString()}</td>
-        <td>${me.role === "founder" ? `<button class="icon-btn" data-del-order="${o.id}">✕</button>` : ""}</td>
+        <td>${me.role === "founder" ? `<button class="icon-btn" data-del-order="${o.id}" title="Delete order">✕</button>` : ""}</td>
       `;
       body.appendChild(tr);
     });
@@ -139,7 +165,10 @@ async function loadOrders() {
   });
   body.querySelectorAll("[data-del-order]").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      if (confirm("Delete this order for good?")) await api(`/api/orders/${btn.dataset.delOrder}`, "DELETE");
+      if (confirm("Delete this order for good?")) {
+        await api(`/api/orders/${btn.dataset.delOrder}`, "DELETE");
+        loadOrders();
+      }
     });
   });
 }
@@ -147,14 +176,19 @@ async function loadOrders() {
 $("#openAddOrder").addEventListener("click", async () => {
   await refreshStockCache();
   $("#orderItemsList").innerHTML = "";
-  addItemRow(); // start with one row, "+ Add item" grows it
+  addItemRow();
   updateOrderTotalPreview();
+  // reset fields
+  $("#ordCustomer").value = "";
+  $("#ordPhone").value = "";
+  $("#ordEmail").value = "";
+  $("#ordAddress").value = "";
+  $("#ordShipping").value = "0";
   $("#orderModal").classList.remove("hidden");
 });
 
 $("#addItemRow").addEventListener("click", () => addItemRow());
 
-// keep a local copy of stock so the dropdowns don't need a network trip on every row
 let stockCache = [];
 async function refreshStockCache() {
   stockCache = await api("/api/stock");
@@ -169,9 +203,9 @@ function addItemRow() {
     .join("");
 
   row.innerHTML = `
-    <select class="item-stock-select">${options || "<option disabled>No stock items yet — add some in the Stock tab first</option>"}</select>
+    <select class="item-stock-select">${options || '<option disabled>No stock items yet — add some in Stock tab first</option>'}</select>
     <input type="number" class="item-qty" min="1" value="1" />
-    <button type="button" class="icon-btn remove-item-row">✕</button>
+    <button type="button" class="icon-btn remove-item-row" title="Remove">✕</button>
   `;
   $("#orderItemsList").appendChild(row);
 
@@ -212,11 +246,13 @@ $("#orderForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const items = collectOrderItems();
   if (items.length === 0) {
-    alert("Pick at least one item from stock, bro.");
+    alert("Pick at least one item from stock.");
     return;
   }
   await api("/api/orders", "POST", {
     customerName: $("#ordCustomer").value.trim(),
+    phone: $("#ordPhone").value.trim(),
+    email: $("#ordEmail").value.trim() || null,
     address: $("#ordAddress").value.trim(),
     items,
     shippingPrice: $("#ordShipping").value,
@@ -226,9 +262,10 @@ $("#orderForm").addEventListener("submit", async (e) => {
   e.target.reset();
   $("#orderItemsList").innerHTML = "";
   $("#orderModal").classList.add("hidden");
+  loadOrders();
 });
 
-// ---------- STOCK ----------
+// ── STOCK ─────────────────────────────────────────────────────────────────
 async function loadStock() {
   const stock = await api("/api/stock");
   const body = $("#stockBody");
@@ -238,10 +275,10 @@ async function loadStock() {
   stock.forEach((s) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${escapeHtml(s.itemName)}</td>
-      <td><input type="number" min="0" value="${s.quantity}" data-qty-id="${s.id}" style="width:70px" /></td>
+      <td style="font-family:var(--font);font-weight:500">${escapeHtml(s.itemName)}</td>
+      <td><input type="number" min="0" value="${s.quantity}" data-qty-id="${s.id}" style="width:80px;font-size:13px;padding:5px 8px" /></td>
       <td>${money(s.price)}</td>
-      <td>${me.role === "founder" ? `<button class="icon-btn" data-del-stock="${s.id}">✕</button>` : ""}</td>
+      <td>${me.role === "founder" ? `<button class="icon-btn" data-del-stock="${s.id}" title="Remove">✕</button>` : ""}</td>
     `;
     body.appendChild(tr);
   });
@@ -253,12 +290,20 @@ async function loadStock() {
   });
   body.querySelectorAll("[data-del-stock]").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      if (confirm("Remove this item from stock?")) await api(`/api/stock/${btn.dataset.delStock}`, "DELETE");
+      if (confirm("Remove this item from stock?")) {
+        await api(`/api/stock/${btn.dataset.delStock}`, "DELETE");
+        loadStock();
+      }
     });
   });
 }
 
-$("#openAddStock").addEventListener("click", () => $("#stockModal").classList.remove("hidden"));
+$("#openAddStock").addEventListener("click", () => {
+  $("#stkName").value = "";
+  $("#stkQty").value = "0";
+  $("#stkPrice").value = "0";
+  $("#stockModal").classList.remove("hidden");
+});
 
 $("#stockForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -269,9 +314,10 @@ $("#stockForm").addEventListener("submit", async (e) => {
   });
   e.target.reset();
   $("#stockModal").classList.add("hidden");
+  loadStock();
 });
 
-// ---------- TEAM (founder only) ----------
+// ── TEAM (founder only) ───────────────────────────────────────────────────
 async function loadUsers() {
   const users = await api("/api/users");
   const body = $("#usersBody");
@@ -279,15 +325,18 @@ async function loadUsers() {
   users.forEach((u) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${escapeHtml(u.username)}</td>
-      <td><span class="role-badge">${u.role}</span></td>
-      <td>${u.role !== "founder" ? `<button class="icon-btn" data-del-user="${u.id}">✕</button>` : ""}</td>
+      <td style="font-family:var(--font);font-weight:500">${escapeHtml(u.username)}</td>
+      <td><span class="role-badge" style="background:var(--surface-raised);border-color:var(--border);color:var(--text-muted)">${u.role}</span></td>
+      <td>${u.role !== "founder" ? `<button class="icon-btn" data-del-user="${u.id}" title="Revoke access">✕</button>` : ""}</td>
     `;
     body.appendChild(tr);
   });
   body.querySelectorAll("[data-del-user]").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      if (confirm("Revoke this account's access?")) await api(`/api/users/${btn.dataset.delUser}`, "DELETE");
+      if (confirm("Revoke this account's access?")) {
+        await api(`/api/users/${btn.dataset.delUser}`, "DELETE");
+        loadUsers();
+      }
     });
   });
 }
@@ -299,10 +348,16 @@ $("#addStaffForm").addEventListener("submit", async (e) => {
     password: $("#newStaffPassword").value,
   });
   e.target.reset();
+  loadUsers();
 });
 
-// ---------- CHANGE PASSWORD ----------
-$("#openChangePassword").addEventListener("click", () => $("#passwordModal").classList.remove("hidden"));
+// ── CHANGE PASSWORD ───────────────────────────────────────────────────────
+$("#openChangePassword").addEventListener("click", () => {
+  $("#pwOld").value = "";
+  $("#pwNew").value = "";
+  $("#pwError").textContent = "";
+  $("#passwordModal").classList.remove("hidden");
+});
 
 $("#passwordForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -320,14 +375,14 @@ $("#passwordForm").addEventListener("submit", async (e) => {
   }
 });
 
-// ---------- modal close buttons ----------
+// ── modal close buttons ───────────────────────────────────────────────────
 document.querySelectorAll("[data-close]").forEach((btn) => {
   btn.addEventListener("click", () => $("#" + btn.dataset.close).classList.add("hidden"));
 });
 
-// don't let a sneaky customer name break the table with a rogue <script>
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str ?? "";
-  return div.innerHTML;
-}
+// close modal on backdrop click
+document.querySelectorAll(".modal").forEach((modal) => {
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.classList.add("hidden");
+  });
+});
